@@ -1,0 +1,15 @@
+# Ignorar el entorno virtual
+../second-env/
+
+# Ignorar archivos de Python compilados
+*.pyc
+__pycache__/
+
+# Ignorar la base de datos SQLite (si la usas)
+db.sqlite3
+
+# Ignorar archivos de media subidos
+/media/
+
+# Ignorar archivos de entorno (si usas uno)
+*.env
