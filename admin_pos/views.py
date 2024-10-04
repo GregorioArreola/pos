@@ -35,9 +35,6 @@ def obtener_empresas(request):
     except requests.exceptions.RequestException as e:
         return JsonResponse({'exito': False, 'error': 'Error al conectarse al servicio de empresas'})
 
-
-import json
-
 @require_GET
 def obtener_productos(request):
     token = request.session.get('token')
@@ -45,11 +42,6 @@ def obtener_productos(request):
     search_term = request.GET.get('q', '').lower()  
     page = int(request.GET.get('page', 1)) 
     items_per_page = 5  
-
-    print("ID de la empresa recibido:", empresa_id)
-    print("Token recibido:", token)
-    print("Término de búsqueda recibido:", search_term)
-    print("Página solicitada:", page)
 
     if not token or not empresa_id:
         return JsonResponse({'productos': [], 'has_more': False})
@@ -65,15 +57,12 @@ def obtener_productos(request):
             verify=False
         )
 
-        print("Respuesta del web service:", response.text)
-
-        if 'data' not in response.json():
-            print("Error: El web service no devolvió el campo 'data'.")
-            return JsonResponse({'productos': [], 'has_more': False, 'error': 'No se encontraron datos'})
-
         data = response.json()
 
-        productos_data = json.loads(data['data'])  
+        if 'data' not in response.json():
+            return JsonResponse({'productos': [], 'has_more': False, 'error': 'No se encontraron datos'})
+
+        productos_data = json.loads(data['data'])
         productos = productos_data.get('productos', [])
         
         if search_term:
@@ -82,14 +71,13 @@ def obtener_productos(request):
         start = (page - 1) * items_per_page
         end = start + items_per_page
         productos_paginados = productos[start:end]
-        has_more = end < len(productos)  
+        has_more = end < len(productos)
 
         return JsonResponse({'productos': productos_paginados, 'has_more': has_more})
 
     except requests.exceptions.RequestException as e:
-        print("Error en la conexión con el web service:", e)
         return JsonResponse({'productos': [], 'has_more': False, 'error': 'Error al conectarse con el web service'})
-
+    
 def empresa_detail(request, empresa_id):
     context = {
     'empresa_id': empresa_id  
